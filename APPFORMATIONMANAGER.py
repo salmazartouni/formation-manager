@@ -279,12 +279,12 @@ def download_logo(path="logo_temp.png"):
 
 # Génération de certificat PDF avec logo
 def creer_certificat(nom, formation, date_certif):
+    # Téléchargement et insertion du logo
     logo_path = download_logo()
 
     pdf = FPDF()
     pdf.add_page()
 
-    # Insérer le logo s'il a été téléchargé, centré horizontalement
     if logo_path and os.path.exists(logo_path):
         logo_w = 50  # largeur du logo en mm
         x_center = (pdf.w - logo_w) / 2
@@ -295,17 +295,15 @@ def creer_certificat(nom, formation, date_certif):
     # Titre principal
     pdf.set_font("Arial", "B", 26)
     pdf.set_text_color(44, 110, 73)
-    pdf.ln(40)
+    pdf.ln(45)
     pdf.cell(
-        0,
-        18,
+        0, 18,
         t("CERTIFICAT DE FORMATION", "TRAINING CERTIFICATE", "CERTIFICADO DE FORMACIÓN"),
-        ln=1,
-        align="C"
+        ln=1, align="C"
     )
     pdf.ln(5)
 
-    # Cadre autour de la page
+    # Cadre
     pdf.set_draw_color(44, 110, 73)
     pdf.set_line_width(1)
     pdf.rect(10, 30, 190, 240)
@@ -315,32 +313,35 @@ def creer_certificat(nom, formation, date_certif):
     pdf.set_font("Arial", "", 14)
     pdf.set_text_color(0, 0, 0)
 
-    # Notez l’utilisation de f''' pour pouvoir mettre librement des '
     texte = f'''
-{t("Ce certificat est décerné à :",
-   "This certificate is awarded to:",
-   "Este certificado se otorga a:")}
+    {t("Ce certificat est décerné à :",
+    "This certificate is awarded to:",
+    "Este certificado se otorga a:")}
 
-{nom}
+    {nom}
 
-{t("Pour avoir suivi avec succès la formation :",
-   "For successfully completing the training:",
-   "Por haber completado con éxito la formación:")}
+    {t("Pour avoir suivi avec succès la formation :",
+    "For successfully completing the training:",
+    "Por haber completado con éxito la formación:")}
 
-"{formation}"
+    "{formation}"
 
-{t("Délivré le :",
-   "Issued on:",
-   "Emitido el:")} {date_certif.strftime("%d/%m/%Y")}
+    {t("Délivré le :",
+    "Issued on:",
+    "Emitido el:")} {date_certif.strftime("%d/%m/%Y")}
 
-{t("Ce certificat atteste de la participation active, de l'assiduité et de l'engagement",
-   "This certificate certifies active participation, regular attendance, and commitment",
-   "Este certificado certifica la participación activa, la asistencia regular y el compromiso")}
+    {t("Ce certificat atteste de la participation active, de l'assiduité et de l'engagement",
+    "This certificate certifies active participation, regular attendance, and commitment",
+    "Este certificado certifica la participación activa, la asistencia regular y el compromiso")}
 
-{t("dans le cadre d'un programme de développement professionnel.",
-   "as part of a professional development program.",
-   "como parte de un programa de desarrollo profesional.")}
-'''
+    {t("dans le cadre d'un programme de développement professionnel.",
+    "as part of a professional development program.",
+    "como parte de un programa de desarrollo profesional.")}
+    '''
+
+    # —————— Correction Unicode pour FPDF ——————
+    # Remplace les apostrophes typographiques ’ par '
+    texte = texte.replace("’", "'")
 
     pdf.multi_cell(0, 10, texte, align="C")
 
@@ -356,6 +357,7 @@ def creer_certificat(nom, formation, date_certif):
     filename = f"Certificat_{nom.replace(' ', '_')}.pdf"
     pdf.output(filename)
     return filename
+
 
 # --- Application principale ---
 def main():
@@ -414,13 +416,13 @@ def main():
         # --- 1) Gestion Formations ---
         with tabs[0]:
             st.markdown(
-                f"<h1 style='text-align:center;font-size:28px; margin:0px;padding:0px'>{t('📘 Gestion des formations','📘 Training Management','📘 Gestión de Formaciones')}</h1>",
+                f"<h1 style='text-align:center;font-size:28px; margin:0px;padding:0px'>{t(' Gestion des formations',' Training Management',' Gestión de Formaciones')}</h1>",
                 unsafe_allow_html=True
             )
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(
-                    f"<h2 style='text-align:center;font-size:18px; margin:0px 0;'>{t('➕ Ajouter une formation','➕ Add Training','➕ Agregar Formación')}</h2>",
+                    f"<h2 style='text-align:center;font-size:18px; margin:0px 0;'>{t(' Ajouter une formation',' Add Training',' Agregar Formación')}</h2>",
                     unsafe_allow_html=True
                 )
                 titre = st.text_input(t("Titre","Title","Título"), key="add_titre")
@@ -476,7 +478,7 @@ def main():
                             conn_prog.commit()
                             cur_test.execute("DELETE FROM tests WHERE formation_id=?", (fid,))
                             conn_test.commit()
-                            st.success(t("Formation modifiée ✏️ — indicateurs réinitialisés","Training updated ✏️ — metrics reset","Formación actualizada ✏️ — indicadores reiniciados"))
+                            st.success(t("Formation modifiée  — indicateurs réinitialisés","Training updated  — metrics reset","Formación actualizada  — indicadores reiniciados"))
                             time.sleep(1)
                             st.rerun()
                     with c_del:
@@ -490,12 +492,12 @@ def main():
                             conn_prog.commit()
                             cur_test.execute("DELETE FROM tests WHERE formation_id=?", (fid,))
                             conn_test.commit()
-                            st.warning(t("Formation supprimée 🗑️ — indicateurs supprimés","Training deleted 🗑️ — metrics removed","Formación eliminada 🗑️ — indicadores eliminados"))
+                            st.warning(t("Formation supprimée  — indicateurs supprimés","Training deleted  — metrics removed","Formación eliminada  — indicadores eliminados"))
                             time.sleep(1)
                             st.rerun()
                 else:
                     st.info(t("Aucune formation disponible.","No training available.","No hay formación disponible."))
-            st.subheader(t("📋 Liste des formations","📋 Training List","📋 Lista de Formación"))
+            st.subheader(t(" Liste des formations"," Training List"," Lista de Formación"))
             cur_form.execute("SELECT titre, date, duree, formateur FROM formations ORDER BY date DESC")
             df_forms = pd.DataFrame(
                 cur_form.fetchall(),
@@ -514,12 +516,12 @@ def main():
         # --- 2) Gestion Employés ---
         with tabs[1]:
             st.markdown(
-                f"<h1 style='text-align:center;font-size:28px; margin:0px;padding:0px'>{t('👥 Gestion des employés','👥 Employee Management','👥 Gestión de Empleados')}</h1>",
+                f"<h1 style='text-align:center;font-size:28px; margin:0px;padding:0px'>{t(' Gestion des employés',' Employee Management',' Gestión de Empleados')}</h1>",
                 unsafe_allow_html=True
             )
             col1, col2 = st.columns(2)
             with col1:
-                st.subheader(t("➕ Ajouter un employé","➕ Add Employee","➕ Agregar Empleado"))
+                st.subheader(t(" Ajouter un employé"," Add Employee"," Agregar Empleado"))
                 nom = st.text_input(t("Nom","Last Name","Apellido"), key="add_nom")
                 prenom = st.text_input(t("Prénom","First Name","Nombre"), key="add_prenom")
                 func_disp = st.selectbox(t("Fonction","Role","Rol"), list(fonctions_ocp.keys()), key="add_fonct")
@@ -556,14 +558,14 @@ def main():
                         if st.button(t("Modifier","Edit","Editar"), key="mod_emp_btn"):
                             cur_emp.execute("UPDATE employes SET nom=?, prenom=?, fonction=? WHERE id=?", (n_n, n_p, n_f, eid))
                             conn_emp.commit()
-                            st.success(t("Employé modifié ✏️","Employee updated ✏️","Empleado actualizado ✏️"))
+                            st.success(t("Employé modifié ","Employee updated ","Empleado actualizado "))
                             time.sleep(1)
                             st.rerun()
                     with c_del2:
                         if st.button(t("Supprimer","Delete","Eliminar"), key="del_emp_btn"):
                             cur_emp.execute("DELETE FROM employes WHERE id=?", (eid,))
                             conn_emp.commit()
-                            st.warning(t("Employé supprimé 🗑️","Employee deleted 🗑️","Empleado eliminado 🗑️"))
+                            st.warning(t("Employé supprimé ","Employee deleted ","Empleado eliminado "))
                             time.sleep(1)
                             st.rerun()
                 else:
@@ -608,7 +610,7 @@ def main():
                         key="admin_f2"
                     )
                     fid2 = mapping_formations[sel2]
-                    st.subheader(t("➕ Ajouter un chapitre","➕ Add Chapter","➕ Agregar Capítulo"))
+                    st.subheader(t(" Ajouter un chapitre"," Add Chapter"," Agregar Capítulo"))
                     ch_title = st.text_input(t("Titre","Title","Título"), key="add2_ch_title")
                     ch_order = st.number_input(
                         t("Ordre","Order","Orden"), min_value=1, step=1, key="add2_ch_order"
@@ -658,7 +660,7 @@ def main():
                         else:
                             st.warning(t("Remplissez tous les champs.","Fill all fields.","Complete todos los campos."))
                     st.markdown("---")
-                    st.subheader(t("✏️ Modifier / 🗑️ Supprimer un chapitre","✏️ Edit / 🗑️ Delete Chapter","✏️ Editar / 🗑️ Eliminar Capítulo"))
+                    st.subheader(t(" Modifier /  Supprimer un chapitre"," Edit /  Delete Chapter"," Editar /  Eliminar Capítulo"))
                     cur_form.execute("SELECT id, titre, type_contenu, contenu, ordre FROM chapitres WHERE formation_id=? ORDER BY ordre", (fid2,))
                     chap_list = cur_form.fetchall()
                     if chap_list:
@@ -716,14 +718,14 @@ def main():
                                 conn_prog.commit()
                                 cur_test.execute("DELETE FROM tests WHERE formation_id=?", (fid2,))
                                 conn_test.commit()
-                                st.warning(t("Chapitre supprimé 🗑️ — indicateurs réinitialisés","Chapter deleted 🗑️ — metrics reset","Capítulo eliminado 🗑️ — indicadores reiniciados"))
+                                st.warning(t("Chapitre supprimé  — indicateurs réinitialisés","Chapter deleted  — metrics reset","Capítulo eliminado  — indicadores reiniciados"))
                                 time.sleep(1)
                                 st.rerun()
                     else:
                         st.info(t("Aucun chapitre à modifier.","No chapter to modify.","Ningún capítulo para modificar."))
             else:
                 # --- Ajouter une question de test ---
-                st.subheader(t("➕ Ajouter une question de test","➕ Add Test Question","➕ Agregar Pregunta de Prueba"))
+                st.subheader(t(" Ajouter une question de test"," Add Test Question"," Agregar Pregunta de Prueba"))
                 fms = cur_form.execute("SELECT id, titre FROM formations").fetchall()
                 if not fms:
                     st.info(t("Créez d'abord une formation.","Please create a training first.","Por favor cree una formación primero."))
@@ -761,7 +763,7 @@ def main():
         # --- 4) Gestion Utilisateur ---
         with tabs[3]:
             st.markdown(
-                f"<h1 style='text-align:center;font-size:28px; margin:0px;padding:0px'>{t('👤 Gestion Utilisateur','👤 User Management','👤 Gestión Usuarios')}</h1>",
+                f"<h1 style='text-align:center;font-size:28px; margin:0px;padding:0px'>{t(' Gestion Utilisateur',' User Management',' Gestión Usuarios')}</h1>",
                 unsafe_allow_html=True
             )
             col1, col2 = st.columns([2.2, 1.3])
@@ -896,7 +898,7 @@ def main():
                     ["Français","English","Español"],
                     index=["Français","English","Español"].index(st.session_state.lang)
                 )
-                search = st.text_input(t("🔍 Recherche","🔍 Search","🔍 Buscar"), key="search_param")
+                search = st.text_input(t(" Recherche"," Search"," Buscar"), key="search_param")
                 if search.strip():
                     q = search.lower()
                     if "formation" in q:
@@ -936,7 +938,7 @@ def main():
             st.write(f"- {t('Build','Build','Compilación')}: {datetime.now().strftime('%Y-%m-%d')}")
             st.subheader(t("FAQ & Support","FAQ & Support","FAQ & Soporte"))
             st.write(t("Q: Comment créer un compte ?","Q: How to create an account?","P: ¿Cómo crear una cuenta?"))
-            st.write(t("R: Dans l’onglet “👤 Utilisateurs”","A: In the “👤 Users” tab","R: En la pestaña “👤 Usuarios”"))
+            st.write(t("R: Dans l’onglet “ Utilisateurs”","A: In the “ Users” tab","R: En la pestaña “ Usuarios”"))
             st.markdown("---")
             st.write("©️ 2025 OCP Group — " + t("Tous droits réservés.","All rights reserved.","Todos los derechos reservados."))
         # --- 6) Tableau de bord Admin ---
@@ -1113,121 +1115,138 @@ def main():
     else:
         # --- Parcourir Formation ---
         with tabs[0]:
-            st.header(t("🎓 Parcourir Formation","🎓 Browse Training","🎓 Navegar Formación"))
+            st.header(t("🎓 Parcourir Formation", "🎓 Browse Training", "🎓 Navegar Formación"))
 
             # Récupérer toutes les formations
             cur_form.execute("SELECT id, titre FROM formations ORDER BY date DESC")
             forms = cur_form.fetchall()
             if not forms:
-                st.info(t("Aucune formation disponible.","No training available.","No hay formación disponible."))
-                st.stop()
-
-            choix = [titre for (_fid, titre) in forms]
-            sel = st.selectbox(t("Choisissez une formation","Select a training","Seleccione una formación"), choix, key="view_form")
-            fid = [fid for (fid, titre) in forms if titre == sel][0]
-
-            # Charger les chapitres pour cette formation
-            cur_form.execute(
-                "SELECT id, titre, type_contenu, contenu FROM chapitres WHERE formation_id = ? ORDER BY ordre",
-                (fid,)
-            )
-            chs = cur_form.fetchall()
-            total = len(chs)
-
-            if total == 0:
-                st.info(t("Pas de chapitres disponibles.","No chapters available.","No hay capítulos disponibles."))
-                st.stop()
-
-            # Initialisation / réinitialisation de l’index de chapitre si changement de formation
-            if "last_fid" not in st.session_state or st.session_state.get("last_fid") != fid:
-                st.session_state.ch_idx = 0
-                st.session_state.last_fid = fid
-
-            idx = st.session_state.get("ch_idx", 0)
-            if idx < 0:
-                idx = 0
-                st.session_state.ch_idx = 0
-            if idx >= total:
-                idx = total - 1
-                st.session_state.ch_idx = idx
-
-            # Récupérer le chapitre courant
-            cid, titre_chap, type_c, cont = chs[idx]
-
-            # Marquer le chapitre comme lu (INSERT OR IGNORE)
-            cur_prog.execute(
-                "INSERT OR IGNORE INTO progress(email, formation_id, chapter_id, timestamp) VALUES(?,?,?,?)",
-                (user_email, fid, cid, datetime.now().isoformat())
-            )
-            conn_prog.commit()
-
-            # Si on est sur le dernier chapitre → message de fin
-            if idx == total - 1:
-                st.success(
-                    t(
-                        "🎉 Vous avez terminé la formation ! Vous pouvez passer le test.",
-                        "🎉 You have finished the training! You can now take the test.",
-                        "🎉 ¡Has terminado la formación! Ahora puedes realizar la prueba."
-                    )
-                )
+                st.info(t("Aucune formation disponible.", "No training available.", "No hay formación disponible."))
             else:
-                # Affichage du “stepper” (= petit cercle coloré) pour chaque chapitre
-                cols = st.columns(total)
-                for i in range(total):
-                    if i < idx:
-                        couleur = "#2c6e49"  # vert = chapitres déjà lus
-                    elif i == idx:
-                        couleur = "#e47157"  # orange = chapitre courant
+                choix = [titre for (_fid, titre) in forms]
+                sel = st.selectbox(
+                    t("Choisissez une formation", "Select a training", "Seleccione una formación"),
+                    choix,
+                    key="view_form"
+                )
+                fid = [fid for (fid, titre) in forms if titre == sel][0]
+
+                # Charger les chapitres pour cette formation
+                cur_form.execute(
+                    "SELECT id, titre, type_contenu, contenu FROM chapitres WHERE formation_id = ? ORDER BY ordre",
+                    (fid,)
+                )
+                chs = cur_form.fetchall()
+                total = len(chs)
+
+                if total == 0:
+                    st.info(t("Pas de chapitres disponibles.", "No chapters available.", "No hay capítulos disponibles."))
+                else:
+                    # Initialisation de l’index de chapitre et de l’état de fin de formation
+                    if "last_fid" not in st.session_state or st.session_state.get("last_fid") != fid:
+                        st.session_state.ch_idx = 0
+                        st.session_state.last_fid = fid
+                        st.session_state.formation_finie = False
+                    if "formation_finie" not in st.session_state:
+                        st.session_state.formation_finie = False
+
+                    idx = st.session_state.get("ch_idx", 0)
+                    if idx < 0:
+                        idx = 0
+                        st.session_state.ch_idx = 0
+                    if idx >= total:
+                        idx = total - 1
+                        st.session_state.ch_idx = idx
+
+                    # Affichage du stepper (cercles d’étapes)
+                    cols = st.columns(total)
+                    for i in range(total):
+                        if i < idx:
+                            couleur = "#2c6e49"
+                        elif i == idx:
+                            couleur = "#e47157"
+                        else:
+                            couleur = "#cfcfcf"
+                        cols[i].markdown(
+                            f"""
+                            <div style="
+                                width:36px;
+                                height:36px;
+                                border-radius:50%;
+                                background-color:{couleur};
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                color:white;
+                            ">{i+1}</div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+
+                    # ----------- Si la formation est finie ----------- #
+                    if st.session_state.formation_finie:
+                        st.success(
+                            t(
+                                "🎉 Vous avez terminé la formation ! Vous pouvez passer le test.",
+                                "🎉 You have finished the training! You can now take the test.",
+                                "🎉 ¡Has terminado la formación! Ahora puedes realizar la prueba."
+                            )
+                        )
+                        if st.button(t("🔁 Recommencer la lecture depuis le début", "🔁 Restart reading from the beginning", "🔁 Volver a empezar desde el principio"), key="restart_reading"):
+                            st.session_state.ch_idx = 0
+                            st.session_state.formation_finie = False
+                            st.rerun()
+                        
                     else:
-                        couleur = "#cfcfcf"  # gris = chapitres non lus
-                    cols[i].markdown(
-                        f"""
-                        <div style="
-                            width:36px;
-                            height:36px;
-                            border-radius:50%;
-                            background-color:{couleur};
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            color:white;
-                        ">{i+1}</div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                        # Récupérer le chapitre courant
+                        cid, titre_chap, type_c, cont = chs[idx]
 
-                # Affichage du contenu du chapitre courant
-                if type_c == "texte":
-                    st.markdown(cont)
-                elif type_c == "pdf":
-                    b64 = base64.b64encode(open(cont, "rb").read()).decode()
-                    st.markdown(
-                        f"<embed src='data:application/pdf;base64,{b64}' width='100%' height='400px'/>",
-                        unsafe_allow_html=True
-                    )
-                elif type_c == "video":
-                    st.video(cont)
-                else:  # ppt
-                    st.download_button(
-                        t("Télécharger PPT","Download PPT","Descargar PPT"),
-                        open(cont, "rb"),
-                        file_name=os.path.basename(cont)
-                    )
+                        # Marquer le chapitre comme lu
+                        cur_prog.execute(
+                            "INSERT OR IGNORE INTO progress(email, formation_id, chapter_id, timestamp) VALUES(?,?,?,?)",
+                            (user_email, fid, cid, datetime.now().isoformat())
+                        )
+                        conn_prog.commit()
 
-                # Boutons de navigation “Précédent” / “Suivant”
-                prev_col, _, next_col = st.columns([1, 6, 1])
-                with prev_col:
-                    if st.button("◀️", key="nav_prev") and idx > 0:
-                        st.session_state.ch_idx = idx - 1
-                        st.rerun()
-                with next_col:
-                    if st.button("▶️", key="nav_next") and idx < total - 1:
-                        st.session_state.ch_idx = idx + 1
-                        st.rerun()
+                        # Affichage du contenu du chapitre courant
+                        if type_c == "texte":
+                            st.markdown(cont)
+                        elif type_c == "pdf":
+                            b64 = base64.b64encode(open(cont, "rb").read()).decode()
+                            st.markdown(
+                                f"<embed src='data:application/pdf;base64,{b64}' width='100%' height='400px'/>",
+                                unsafe_allow_html=True
+                            )
+                        elif type_c == "video":
+                            st.video(cont)
+                        else:  # ppt
+                            st.download_button(
+                                t("Télécharger PPT", "Download PPT", "Descargar PPT"),
+                                open(cont, "rb"),
+                                file_name=os.path.basename(cont)
+                            )
+
+                        # Boutons navigation
+                        prev_col, _, next_col = st.columns([1, 6, 1])
+                        with prev_col:
+                            if st.button("◀️", key="nav_prev") and idx > 0:
+                                st.session_state.ch_idx = idx - 1
+                                st.session_state.formation_finie = False
+                                st.rerun()
+                        with next_col:
+                            if st.button("▶️", key="nav_next"):
+                                if idx < total - 1:
+                                    st.session_state.ch_idx = idx + 1
+                                    st.session_state.formation_finie = False
+                                    st.rerun()
+                                else:
+                                    # Si on clique “suivant” au dernier chapitre : FIN
+                                    st.session_state.formation_finie = True
+                                    st.rerun()
 
         # --- Passer le test ---
         with tabs[1]:
-            st.header(t("📝 Passer le test","📝 Take Test","📝 Realizar Prueba"))
+            st.header(t(" Passer le test"," Take Test"," Realizar Prueba"))
             # Récupérer toutes les formations
             cur_form.execute("SELECT id, titre FROM formations")
             forms = cur_form.fetchall()
@@ -1304,23 +1323,41 @@ def main():
 
         # --- Mes certificats ---
         with tabs[2]:
-            st.header(t("🏆 Mes certificats","🏆 My Certificates","🏆 Mis Certificados"))
-            cur_test.execute("SELECT formation_id FROM tests WHERE email = ? AND passed = 1", (user_email,))
+            st.header(t(" Mes certificats"," My Certificates"," Mis Certificados"))
+            # Récupère les formations validées
+            cur_test.execute(
+                "SELECT formation_id FROM tests WHERE email = ? AND passed = 1",
+                (user_email,)
+            )
             passed = [r[0] for r in cur_test.fetchall()]
+
             if not passed:
                 st.info(t("Aucun certificat obtenu.","No certificates earned.","No hay certificados obtenidos."))
             else:
+                # Avant la boucle, on récupère le nom et le prénom de l'utilisateur
+                cur_users.execute(
+                    "SELECT nom, prenom FROM utilisateurs WHERE email = ?",
+                    (user_email,)
+                )
+                row_user = cur_users.fetchone()
+                if row_user:
+                    nom_util, prenom_util = row_user
+                    full_name = f"{nom_util} {prenom_util}"
+                else:
+                    full_name = user_email  # fallback
+
                 for fidc in passed:
+                    # Titre de la formation
                     cur_form.execute("SELECT titre FROM formations WHERE id = ?", (fidc,))
                     row = cur_form.fetchone()
-                    if row is not None:
-                        tit = row[0]
-                    else:
-                        tit = t("Formation inconnue","Unknown training","Formación desconocida")
+                    tit = row[0] if row else t("Formation inconnue","Unknown training","Formación desconocida")
+
                     obt = date.today().strftime("%d/%m/%Y")
                     st.write(f"**{tit}** — {t('obtenu le','earned on','obtenido el')} {obt}")
+
                     if st.button(t("Télécharger","Download","Descargar"), key=f"cert_{fidc}"):
-                        fn = creer_certificat(user_email, tit, date.today())
+                        # On passe désormais full_name au lieu de user_email
+                        fn = creer_certificat(full_name, tit, date.today())
                         with open(fn, "rb") as f:
                             st.download_button("⬇️ PDF", f, file_name=fn)
 
@@ -1328,7 +1365,7 @@ def main():
         with tabs[3]:
             st.markdown(f"<h1 style='text-align:center;'>{t('⚙️ Paramètres','⚙️ Settings','⚙️ Ajustes')}</h1>", unsafe_allow_html=True)
             # Profil
-            st.subheader(t("👤 Profil","👤 Profile","👤 Perfil"))
+            st.subheader(t(" Profil"," Profile"," Perfil"))
             col1, col2 = st.columns([3,1])
             with col1:
                 st.text_input(t("Utilisateur","User","Usuario"), value=user_email, disabled=True)
@@ -1347,7 +1384,7 @@ def main():
 
             st.markdown("---")
             # Langue & Notifications
-            st.subheader(t("🌐 Langue & Notifications","🌐 Language & Notifications","🌐 Idioma & Notificaciones"))
+            st.subheader(t(" Langue & Notifications"," Language & Notifications"," Idioma & Notificaciones"))
             lang = st.selectbox(
                 t("Langue de l’interface","Interface language","Idioma de la interfaz"),
                 ["Français","English","Español"],
@@ -1364,7 +1401,7 @@ def main():
                     if cur_users.fetchone()[0] == ancien:
                         cur_users.execute("UPDATE utilisateurs SET mot_de_passe=? WHERE email=?", (nouveau, user_email))
                         conn_users.commit()
-                        st.success(t("🔑 Mot de passe mis à jour","🔑 Password updated","🔑 Contraseña actualizada"))
+                        st.success(t(" Mot de passe mis à jour"," Password updated"," Contraseña actualizada"))
                     else:
                         st.error(t("❌ Ancien mot de passe incorrect","❌ Old password incorrect","❌ Contraseña antigua incorrecta"))
                 save_param("lang", lang)
@@ -1400,12 +1437,8 @@ def main():
                 ))
             st.write(f"© 2025 OCP Group — {t('Tous droits réservés.','All rights reserved.','Todos los derechos reservados.')}")
 
-        with tabs[4]:
+       
             
-            st.markdown(
-                f"<h1 style='text-align:center'>{t('📊 Mes indicateurs','📊 My Metrics','📊 Mis Indicadores')}</h1>",
-                unsafe_allow_html=True
-            )
         # --- 5) Mon Dashboard (Utilisateur) ---
         with tabs[4]:
             st.markdown(f"<h1 style='text-align:center'>{t('📊 Mes indicateurs','📊 My Metrics','📊 Mis Indicadores')}</h1>", unsafe_allow_html=True)
